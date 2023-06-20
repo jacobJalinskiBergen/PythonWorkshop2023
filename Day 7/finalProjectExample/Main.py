@@ -4,7 +4,7 @@ import Deck
 import Hand
 from TextGenerator import text
 
-GAME_SIZE = (1400,900)
+GAME_SIZE = (1200,800)
 TEST_TEXT = False
 
 class Game:
