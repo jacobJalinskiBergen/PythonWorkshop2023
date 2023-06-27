@@ -29,66 +29,63 @@ class Game:
         #self.discardPile.discard(self.deck.draw())
 
     def update(self):
-        while (self.run):
-            #Sets max framerate (Not needed for card game but I included it anyways)
-            self.clock.tick(120)
+        #Sets max framerate (Not needed for card game but I included it anyways)
+        self.clock.tick(120)
 
-            events = pygame.event.get()
-            for event in events:
-                #When the exit button at the top right is pressed:
-                if event.type == pygame.QUIT:
-                    self.run = False
+        events = pygame.event.get()
+        for event in events:
+            #When the exit button at the top right is pressed:
+            if event.type == pygame.QUIT:
+                self.run = False
 
-                #When the user left clicks:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.turn != 2:
-                        if self.turn and self.phase: #CPU's discard phase
-                            self.cHand.discard(self.cHand.computerDiscard())
-                            self.turn = 0
-                            self.phase = 0
-                        elif self.turn and not self.phase: #CPU's draw phase
-                            self.cHand.draw()
-                            self.phase = 1
-                        elif not self.turn and not self.phase: #User's draw phase
-                            self.pHand.draw()
-                            self.phase = 1
-                    else:
-                        self.deck.populate()
-                        self.cHand.clearHand()
-                        self.pHand.clearHand()
-                        self.discardPile.clearDeck()
-                        for i in range(8):
-                            self.cHand.draw()
-                            self.pHand.draw()
+            #When the user left clicks:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.turn != 2:
+                    if self.turn and self.phase: #CPU's discard phase
+                        self.cHand.discard(self.cHand.computerDiscard())
                         self.turn = 0
                         self.phase = 0
-                        
-            #Specific instructions for when player's discard phase. Done to avoid tracking mouse position + show off button presses
-            if not self.turn and self.phase: #User's discard phase (The only complicated one)
-                keys = pygame.key.get_pressed()
-                chosen = -1
-                i = 0
-                for k in [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9]:
-                    if chosen == -1 and keys[k]:
-                        chosen = i
-                    i+=1
-
-                if chosen != -1:
-                    self.pHand.discard(self.pHand.nthCard(chosen))
-                    self.turn = 1   
-                    self.phase = 0
-
-            if self.deck.isEmpty():
-                self.deck.merge(self.discardPile)
-
-            if self.phase == 0 and self.turn != 2 and (self.pHand.checkWin() or self.cHand.checkWin()):
-                if self.pHand.checkWin():
-                    self.score[0] += 1
+                    elif self.turn and not self.phase: #CPU's draw phase
+                        self.cHand.draw()
+                        self.phase = 1
+                    elif not self.turn and not self.phase: #User's draw phase
+                        self.pHand.draw()
+                        self.phase = 1
                 else:
-                    self.score[1] += 1
-                self.turn = 2
+                    self.deck.populate()
+                    self.cHand.clearHand()
+                    self.pHand.clearHand()
+                    self.discardPile.clearDeck()
+                    for i in range(8):
+                        self.cHand.draw()
+                        self.pHand.draw()
+                    self.turn = 0
+                    self.phase = 0
+                    
+        #Specific instructions for when player's discard phase. Done to avoid tracking mouse position + show off button presses
+        if not self.turn and self.phase: #User's discard phase (The only complicated one)
+            keys = pygame.key.get_pressed()
+            chosen = -1
+            i = 0
+            for k in [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9]:
+                if chosen == -1 and keys[k]:
+                    chosen = i
+                i+=1
 
-            self.draw()
+            if chosen != -1:
+                self.pHand.discard(self.pHand.nthCard(chosen))
+                self.turn = 1   
+                self.phase = 0
+
+        if self.deck.isEmpty():
+            self.deck.merge(self.discardPile)
+
+        if self.phase == 0 and self.turn != 2 and (self.pHand.checkWin() or self.cHand.checkWin()):
+            if self.pHand.checkWin():
+                self.score[0] += 1
+            else:
+                self.score[1] += 1
+            self.turn = 2
 
     def draw(self):
         #The following if statement and its contents are for debugging purposes
@@ -141,5 +138,7 @@ class Game:
 
 def main():
     newGame = Game()
-    newGame.update()
+    while newGame.run:
+        newGame.update()
+        newGame.draw()
 main()
